@@ -220,4 +220,7 @@ combineddata <- inner_join(hit_set, stock_prices, by="weeks")
 combineddata <- combineddata %>%
   select("weeks", "ends_of_week_date", "stock_dates", starts_with("aapl"), starts_with("amzn"), starts_with("dji"), 
          starts_with("fb"), starts_with("googl"), starts_with("gspc"), starts_with("msft"), starts_with("nhy"), 
-         starts_with("salm"), starts_with("tel"), starts_with("tsla"))
+         starts_with("salm"), starts_with("tel"), starts_with("tsla")) %>% #starts_with has ignore.case=TRUE as default
+  rename(AAPL_hits = "aapl_hits", AMZN_hits = "amzn_hits", FB_hits = "fb_hits", GOOGL_hits = "googl_hits", 
+         MSFT_hits = "msft_hits", NHY_hits = "nhy_hits", SALM_hits = "salm_hits", TEL_hits = "tel_hits", TSLA_hits = "tsla_hits")
+
