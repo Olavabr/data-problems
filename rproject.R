@@ -62,7 +62,7 @@ TSLA <- TSLA%>%
   mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
 
 AMZN <- AMZN%>%
-  mutate(normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
 
 #getting weekly data for companies
 
@@ -203,8 +203,7 @@ names(AMZN) <- str_replace_all(names(AMZN), c(" " = ""))
 
 
 ## Create a tibble with all the companies
-stock_prices <- as_tibble(c(AAPL, DJI,FB, GOOGL, GSPC, MSFT, NHY, SALM, TEL, TSLA))
-View(stock_prices)
+stock_prices <- as_tibble(c(AAPL, AMZN, DJI,FB, GOOGL, GSPC, MSFT, NHY, SALM, TEL, TSLA))
 
 
 stock_prices <- stock_prices %>%
@@ -223,4 +222,3 @@ combineddata <- combineddata %>%
          starts_with("salm"), starts_with("tel"), starts_with("tsla")) %>% #starts_with has ignore.case=TRUE as default
   rename(AAPL_hits = "aapl_hits", AMZN_hits = "amzn_hits", FB_hits = "fb_hits", GOOGL_hits = "googl_hits", 
          MSFT_hits = "msft_hits", NHY_hits = "nhy_hits", SALM_hits = "salm_hits", TEL_hits = "tel_hits", TSLA_hits = "tsla_hits")
-
