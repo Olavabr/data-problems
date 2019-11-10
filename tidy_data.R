@@ -28,7 +28,8 @@ TEL <- read_csv("TEL.csv")
 
 TSLA <- read_csv("TSLA.csv")
 
-AMZN <- read_csv("AMZN.csv")
+AMZN <- read_csv("AMZN.csv", col_types = cols(Date = col_date(format = "%d/%m/%Y"))) 
+  #for some reason were the dates formatted as characters in only this particular dataset. 
 
 ####### creating a new vector in each 
 AAPL <- AAPL%>%
@@ -120,7 +121,7 @@ GOOGL <- GOOGL %>%
 GSPC <- GSPC %>%
   mutate(ticker = "GSPC")%>%
   mutate(hits = NA)
- 
+
 
 MSFT <- MSFT %>%
   mutate(ticker = "MSFT")%>%
@@ -150,6 +151,5 @@ AMZN <- AMZN %>%
 #combine all the different datasets into a nice Tidy tibble
 
 combinedd <- rbind(AMZN,TSLA,DJI,FB,GOOGL,GSPC,MSFT,NHY,SALM,TEL,AAPL)
-
 
 
