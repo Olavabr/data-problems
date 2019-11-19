@@ -24,19 +24,19 @@ ones <- rep(1,26)
 tot <- c(zeros,ones)
 
 
-combinedd_tree <- combinedd_tree%>%
+combinedd_tree <- combinedd_tree%>% 
   group_by(ticker)%>%
   arrange(ticker,abs(delta))%>%
   drop_na()%>%
-  mutate(big_delta = as.factor(tot))
+  mutate(big_delta = as.factor(tot)) ##assigning the outcome variable to the most volotile weeks, for each company
 
 
-### adding the outcome variable to each company as the 26 most volatile days
+
 
 
 
 ## CREATE TRAINING AND TEST SAMPLE
-train <- sample(1:261, 208) #all companies have the same number of rows = 262 (260 after removing missing values) 
+train <- sample(1:261, 208) #all companies have the same number of rows = 261
 trainset <- combinedd_tree %>%
   group_by(ticker) %>%
   slice(train)
@@ -45,57 +45,63 @@ testset <- combinedd_tree %>%
   group_by(ticker) %>%
   slice(-train)
 
-#in total
-rocky <- rpart(big_delta ~ hits, data = trainset)
-predz <- predict(rocky, testset, type = "class")
-testset$total_single <- predz
+######## The analisys ########
 
-rocky_random <- randomForest(big_delta ~ hits, data = trainset)
-predz_random <- predict(rocky_random, testset)
-testset$total_single_random <- predz_random
+##### first by looking at all the companies at once. ####
 
-table(testset$big_delta,testset$total_single)
-table(testset$big_delta,testset$total_single_random)
+rocky <- rpart(big_delta ~ hits, data = trainset) #training the classefiation tree
+predz <- predict(rocky, testset, type = "class") # predicting the outcome variables in the test dataset
+testset$total_single <- predz  #adding the results to the test data set.
+
+rocky_random <- randomForest(big_delta ~ hits, data = trainset) #training the random forest
+predz_random <- predict(rocky_random, testset) # predicting the outcome variables in the test dataset
+testset$total_single_random <- predz_random  #adding the results to the test data set.
+
+table(testset$big_delta,testset$total_single) #creating a confusion matrix with the results from the classefication tree
+table(testset$big_delta,testset$total_single_random) #creating a confusion matrix with the results from the random forest
 
   
-##for each company
-guesses <- c()
+####### now the analisys useing the variation of google searches for each company ########
+
+companies <- c("AAPL","AMZN","FB", "GOOGL", "MSFT", "NHY", "SALM", "TEL", "TSLA") #making a list of all the company names
+
+###classefication tree#######
+guesses <- c() #creating an empty vector to store the results
 for (i in companies) {
-  training <- trainset%>%
+  training <- trainset%>% #finding the data of company i, that is in the training dataset
     filter(ticker == i)
   testing <- testset%>%
-    filter(ticker == i)%>%
+    filter(ticker == i)%>% #finding the data of company i, that is in the test dataset
     arrange(big_delta)
   
-  balboa <- rpart(big_delta~ hits, training)
-  rpart.plot(balboa)
-  pred <- predict(balboa,testing, type = "class")
-  guesses <- append(guesses,pred)
+  balboa <- rpart(big_delta~ hits, training) #training the classefiation tree model for company i
+  pred <- predict(balboa,testing, type = "class")  # predicting the outcome variables in the test dataset for company i
+  guesses <- append(guesses,pred) #adding the results for company i to a list of all the results
 }
-guesses <- guesses -1
-testset$guess <- guesses
+guesses <- guesses -1 #for some reason, the predict function resulted in 1's and 2's.. not 0's and 1's...
+testset$guess <- guesses # adding the results to the test dataset
 
 
-#########random forest stuff:
-guesses_random <- c()
+#########random forest ########
+guesses_random <- c() #creating an empty vector to store the results
 for (i in companies) {
-  training <- trainset%>%
+  training <- trainset%>% #finding the data of company i, that is in the training dataset
     filter(ticker == i)
   
-  testing <- testset%>%
+  testing <- testset%>% #finding the data of company i, that is in the test dataset
     filter(ticker == i)%>%
     arrange(big_delta)
     
   
-  balboa_random <- randomForest(big_delta ~ hits, training)
-  pred_random <- predict(balboa_random,testing, type = "class")
-  guesses_random <- append(guesses_random,pred_random)
+  balboa_random <- randomForest(big_delta ~ hits, training) #training the random forest model for company i
+  pred_random <- predict(balboa_random,testing, type = "class") # predicting the outcome variables in the test dataset for company i
+  guesses_random <- append(guesses_random,pred_random) #adding the results for company i to a list of all the results
 }
-guesses_random <- guesses_random -1
-testset$guess_random <- guesses_random
+guesses_random <- guesses_random -1 #for some reason, the predict function resulted in 1's and 2's.. not 0's and 1's...
+testset$guess_random <- guesses_random # adding the results to the test dataset
 
 
-#### making tables of the results
+#### making confusion matrecis for both the classefication tree, and the random forrest
 table(testset$big_delta,testset$guess)
 
 table(testset$big_delta,testset$guess_random)
@@ -103,7 +109,7 @@ table(testset$big_delta,testset$guess_random)
 
 
 
-##########for bitcoin################################
+##########for bitcoin################################ it follows the same prosedure as the analisys above
 zeros_b <- rep(0,202)
 ones_b <- rep(1,22)
 tot_b <- c(zeros_b,ones_b,NA)
@@ -142,7 +148,3 @@ test_set_b$guess_random <- rocky_random
 table(test_set_b$big_delta,test_set_b$guess)
 
 table(test_set_b$big_delta,test_set_b$guess_random)
-
-
-######################################################
-
