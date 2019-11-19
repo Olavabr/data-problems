@@ -1,12 +1,14 @@
 rm(list=ls())
 
-setwd("Master/Pirate programming/DAta")
+setwd("C:/Users/Olav/Documents/Master/Pirate programming/DAta")
 
 library(gtrendsR)
 
 library(tidyverse)
 
-########## importing the stock data
+
+
+########## importing the stock data. Found through yahoo finance, form 30.12.2013(DMY), to 31.12.2018 (DMY), 262 weeks (exept for bitcoin)
 
 FB <- read_csv("FB.csv")
 
@@ -28,53 +30,13 @@ TEL <- read_csv("TEL.csv")
 
 TSLA <- read_csv("TSLA.csv")
 
-AMZN <- read_csv("AMZN.csv", col_types = cols(Date = col_date(format = "%d/%m/%Y"))) 
-  #for some reason were the dates formatted as characters in only this particular dataset. 
+AMZN <- read_csv("AMZN.csv") 
 
-####### creating a new vector in each 
-AAPL <- AAPL%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-DJI <- DJI%>%
-  mutate(hits = NA)%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-FB <- FB%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-GOOGL <- GOOGL%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-GSPC <- GSPC%>%
-  mutate(hits = NA)%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-MSFT <- MSFT%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-NHY <- NHY%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-SALM <- SALM%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-TEL <- TEL%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-TSLA <- TSLA%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
-
-AMZN <- AMZN%>%
-  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)
+BTC <- read_csv("BTC.csv")
+ 
 
 #getting weekly data for companies
-
-library(tidyverse)
-library(gtrendsR) # package that allows for extraction of google search data
-
-#salm,nhy,msft,fb,btc-usd,aapl,tsla,telenor
-
-## NOTE due to low(er) avargage volume of searches for norwgian companies and bitcoin, we will use all kinds of google searches for the norwegian companies (more spessiffic: gprop = "web") 
+## NOTE due to low(er) avargage volume of searches for norwgian companies, we will use all kinds of google searches for the norwegian companies (more spessiffic: gprop = "web") 
 
 salm_gt <- gtrends(keyword = 'salmar', time = "2013-12-29 2018-12-31", onlyInterest = T) 
 
@@ -98,58 +60,87 @@ amzn_gt <- gtrends(keyword = 'amazon', time = "2013-12-29 2018-12-31", gprop = "
 
 googl_gt <- gtrends(keyword = 'google', time = "2013-12-29 2018-12-31", gprop = "news", onlyInterest = T)
 
-#now to gather all the data into a nice dataset:
+# and bitcoin. Its a shorter trend due to it having a shorter available price trend compared to the others.
+
+btc_gt <- gtrends(keyword = 'bitcoin', time = "2014-09-13 2018-12-31", onlyInterest = T)
 
 
 
 
-## Set google hits and stock info toghether. and add ticker names as a variable
+#now to gather all the data into a nice dataset, and make some new variables:
+### 1) creating a new vector in each that are normalized in the same way as the google trends are normalized
+### 2) Set google hits and stock info toghether. and add ticker names as a variable
+### 3) making a collumn with the ticker name
 AAPL <- AAPL %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(hits = aapl_gt$interest_over_time$hits)%>%
   mutate(ticker = "AAPL")
 DJI <- DJI %>%
-  mutate(ticker = "DJI")%>%
-  mutate(hits = NA)
+  mutate(hits = NA)%>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
+  mutate(ticker = "DJI")
+
 FB <- FB %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "FB")%>%
   mutate(hits = fb_gt$interest_over_time$hits)
 
 GOOGL <- GOOGL %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "GOOGL")%>%
   mutate(hits = googl_gt$interest_over_time$hits)
 
 GSPC <- GSPC %>%
-  mutate(ticker = "GSPC")%>%
-  mutate(hits = NA)
+  mutate(hits = NA)%>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
+  mutate(ticker = "GSPC")
+
 
 
 MSFT <- MSFT %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "MSFT")%>%
   mutate(hits = msft_gt$interest_over_time$hits)
 
 NHY <- NHY %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "NHY")%>%
   mutate(hits = nhy_gt$interest_over_time$hits)
 
 SALM <- SALM %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "SALM")%>%
   mutate(hits = salm_gt$interest_over_time$hits)
 
 TEL <- TEL %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "TEL")%>%
   mutate(hits = tel_gt$interest_over_time$hits)
 
 TSLA <- TSLA %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "TSLA")%>%
   mutate(hits = tsla_gt$interest_over_time$hits)
 
 AMZN <- AMZN %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
   mutate(ticker = "AMZN")%>%
   mutate(hits = amzn_gt$interest_over_time$hits)
+
+BTC <- BTC %>%
+  mutate(Normalized = `Adj Close`/max(`Adj Close`, na.rm = FALSE)*100)%>%
+  mutate(ticker = "BTC")%>%
+  mutate(hits = btc_gt$interest_over_time$hits)
 
 
 #combine all the different datasets into a nice Tidy tibble
 
-combinedd <- rbind(AMZN,TSLA,DJI,FB,GOOGL,GSPC,MSFT,NHY,SALM,TEL,AAPL)
+combinedd <- rbind(AMZN,TSLA,DJI,FB,GOOGL,GSPC,MSFT,NHY,SALM,TEL,AAPL,BTC)
+
+
+#remove all the unused vaectors and datasets.
+lsss <- ls()
+lsss <- lsss[lsss != "combinedd"]
+rm(list = lsss)
 
 
