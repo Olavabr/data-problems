@@ -1,4 +1,6 @@
 #need to run the tidy_data.R (initializing the data set) before running this code
+library(tidyverse)
+
 # adding some varialbes to the dataset: 
 combidata <- combinedd%>%
   filter(! ticker %in% c("DJI","GSPC"))%>%
@@ -30,15 +32,7 @@ facetin_trends <- combidata%>% #trends for the six companies
   ylab("Value")
 
 
-
-btc_delta <- combidata%>% #point graf showing absolute change in normalized stock value on the y-axis, and normalized hits in the x-axis
-  filter(ticker == "BTC")%>%
-  ggplot(aes(x = hits, y = abs_delta))+
-  geom_point()+
-  geom_smooth(method = 'lm')+
-  ylab("absolute change in value")
-
-facetin_normalized <- combidata%>% #
+facetin_normalized <- combidata%>% #Displaying normalized stock price and hits in a scatter plot. and a linear regression line
   group_by(ticker)%>%
   filter(ticker != "BTC")%>%
   ggplot(aes(x = hits, y= Normalized))+
@@ -47,7 +41,7 @@ facetin_normalized <- combidata%>% #
   facet_wrap(~ticker)+
   ylab("Normalized price")
 
-total_delta <- combidata%>%
+total_normalized <- combidata%>% #displaying all obeservations of normalized and hits in the same graph with a regression line
   filter(ticker != "BTC")%>%
   ggplot(aes(x = hits, y= Normalized))+
   geom_point()+
@@ -55,7 +49,7 @@ total_delta <- combidata%>%
   ylab("normalized price")
   
 
-facetin_volume_hits <- combidata%>%
+facetin_volume_hits <- combidata%>% #volume and hits in the same scatter plot. with a regression line, for each company
   group_by(ticker)%>%
   filter(ticker != "BTC")%>%
   ggplot(aes(x = hits, y= norm_volume))+
@@ -65,18 +59,12 @@ facetin_volume_hits <- combidata%>%
   ylab("normalized volume")
   
 
-total_volume <- combidata%>%
+total_volume <- combidata%>% # all observations of volume and hits in the same graph with a regression line
   filter(ticker != "BTC")%>%
   ggplot(aes(x = hits, y= norm_volume))+
   geom_point()+
   geom_smooth(method = 'lm')+
   ylab("Normalized volume")
-
-
-hits_bidielta <- combidata%>%
-  filter(! ticker %in% c("DJI","GSPC"))%>%
-  ggplot()+
-  geom_point(aes(x = hits, y= norm_volume,color = big_delta))
 
 
 
